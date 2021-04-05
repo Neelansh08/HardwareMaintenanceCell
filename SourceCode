@@ -1,0 +1,456 @@
+#include<conio.h>
+#include<fstream.h>
+#include<stdlib.h>
+#include<iomanip.h>
+#include<string.h>
+#include<stdio.h>
+#include<iostream.h>
+const char* fileName="Employee.txt";
+
+class Employee
+{
+private:
+int EmpID;
+char EmpName[50],Post[50],Department[10];
+float Salary;
+public:
+void ReadData();
+int GetID();
+void DisplayRecord();
+char* GetDepartment();
+};
+
+void pattern()
+{
+cout<<setw(44)<<"Project by Neelansh ";
+//cout<<"\n\t\t**************************************";
+cout<<"\n\t\t*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_ * ";
+cout<<"\n\t\t*     HARDWARE MAINTENANCE CELL      * ";
+cout<<"\n\t\t*____________________________________*";
+}
+
+void Employee::ReadData()
+{
+clrscr();
+pattern();
+cout<<endl<<"Employee ID:";
+cin>>EmpID;
+cout<<"Employee Name:";
+cin>>EmpName;
+cout<<"Employee's Post:";
+cin>>Post;
+cout<<"Employee's Department:";
+cin>>Department;
+cout<<"Salary:";
+cin>>Salary;
+}
+
+void Employee::DisplayRecord()
+{
+clrscr();
+pattern();
+cout<<endl<<"_______________________________";
+cout<<endl<<setw(5)<<EmpID<<setw(15)<<EmpName<<setw(15)<<Post<<setw(15)<<Department<<setw(8)<<Salary;
+}
+
+int Employee::GetID()
+{
+clrscr();
+pattern();
+return EmpID;
+}
+
+char* Employee::GetDepartment()
+{
+clrscr();
+pattern();
+return Department;
+}
+
+void main()
+{
+Employee emp,e;
+char choice;
+char option,ch,Dept[50];
+int ID,isFound;
+clrscr();
+fstream file;
+file.open(fileName,ios::ate|ios::in|ios::out|ios::binary);
+do
+{
+pattern();
+cout<<"\n\ta. General Checklist "<<endl;
+cout<<"\t******************************"<<endl;
+cout<<"\tb. Component Replacement "<<endl;
+cout<<"\t   e. Hard Drive"<<"\tf. Power Supply"<<"\tg. Video Card"<<"\th. Mother Board"<<endl;
+cout<<"\t******************************"<<endl;
+cout<<"\tc. Prevalent Hardware Problems "<<endl;
+cout<<"\t   i. Startup Problem"<<"\tj. Blank Screen"<<"\tk. Frozen Screen";
+cout<<"\n\t   l. Strange Noises"<<"\tm. Overheating";
+cout<<"\n\t******************************"<<endl;
+cout<<"\td. Our Staff Details. "<<endl;
+cout<<endl<<"\t   1 => Add a new record";
+
+cout<<endl<<"\t   2 => Search record from employee id";
+
+cout<<endl<<"\t   3 => List Employee of particular department";
+
+cout<<endl<<"\t   4 => Display all employee";
+
+cout<<endl<<"\t   5 => Update record of an employee";
+
+cout<<endl<<"\t   6 => Delete record of particular employee";
+
+cout<<endl<<"\t   7 => EXIT from the program"<<endl;
+
+cout<<"Enter your OPTION"<<endl;
+cin>>option;
+switch(option)
+{
+case '1':
+emp.ReadData();
+file.seekg(0,ios::beg);
+isFound=0;
+file.read((char*)&e,sizeof(e));
+while(!file.eof())
+{
+if(e.GetID()==emp.GetID())
+{
+cout<<"This ID already exist...Try for another ID";
+isFound=1;
+break;
+}
+file.read((char*)&e,sizeof(e));
+}
+if(isFound==1)
+break;
+file.clear();
+file.seekp(0,ios::end);
+file.write((char*)&emp, sizeof(emp));
+cout<<endl<<"New record has been added successfully...";
+break;
+
+case '2':
+isFound=0;
+cout<<endl<<"Enter ID of an employee to be searched:";
+cin>>ID;
+file.seekg(0,ios::beg);
+file.read((char*)&e,sizeof(e));
+while(!file.eof())
+{
+if(e.GetID()==ID)
+{
+cout<<endl<<"The record found...."<<endl;
+cout<<endl<<setw(5)<<"ID"<<setw(15)<<"Name"<<setw(15)<<"Post"<<setw(15)<<"Department"<<setw(8)<<"Salary";
+e.DisplayRecord();
+isFound=1;
+break;
+}
+file.read((char*)&e,sizeof(e));
+}
+file.clear();
+if(isFound==0)
+cout<<endl<<"Data not found for employee ID#"<<ID;
+break;
+case '3':
+isFound=0;
+cout<<"Enter department name to list employee within it:";
+cin>>Dept;
+file.seekg(0,ios::beg);
+file.read((char*)&e,sizeof(e));
+while(!file.eof())
+{
+if(strcmp(e.GetDepartment(),Dept)==0)
+{
+cout<<endl<<"The record found for this department"<<endl;
+
+cout<<endl<<setw(5)<<"ID"<<setw(15)<<"Name"<<setw(15)<<"Post"<<setw(15)<<"Department"<<setw(8)<<"Salary";
+e.DisplayRecord();
+isFound=1;
+break;
+}
+file.read((char*)&e,sizeof(e));
+}
+file.clear();
+if(isFound==0)
+cout<<endl<<"Data not found for department"<<Dept;
+break;
+
+case '4':
+cout<<endl<<"Record for employee";
+file.clear();
+file.seekg(0,ios::beg);
+int counter=0;
+file.read((char*)&e,sizeof(e));
+while(!file.eof())
+{
+counter++;
+if(counter==1)
+{
+cout<<endl<<setw(5)<<"ID"<<setw(15)<<"Name"<<setw(15)<<"Post"<<setw(15)<<"Department"<<setw(8)<<"Salary";
+}
+e.DisplayRecord();
+file.read((char*)&e,sizeof(e));
+}
+cout<<endl<<counter<<"records found......";
+file.clear();
+break;
+
+case '5':
+int recordNo=0;
+cout<<endl<<"File is being modified....";
+cout<<endl<<"Enter employee ID to be updated:";
+cin>>ID;
+isFound=0;
+file.seekg(0,ios::beg);
+file.read((char*)&e,sizeof(e));
+while(!file.eof())
+{
+recordNo++;
+if(e.GetID()==ID)
+{
+cout<<"The old record of employee having ID"<<ID<< "is:";
+e.DisplayRecord();
+isFound=1;
+break;
+}
+file.read((char*)&e,sizeof(e));
+}
+
+if(isFound==0)
+{
+cout<<endl<<"Data not found for employee ID#"<<ID;
+break;
+}
+file.clear();
+int location=(recordNo-1)*sizeof(e);
+file.seekp(location,ios::beg);
+cout<<endl<<"Enter new record for employee having ID"<<ID;
+e.ReadData();
+file.write((char*)&e, sizeof(e));
+break;
+
+case '6':
+recordNo=0;
+cout<<endl<<"Enter employment ID to be deleted:";
+cin>>ID;
+isFound=0;
+file.seekg(0,ios::beg);
+file.read((char*)&e,sizeof(e));
+while(!file.eof())
+{
+recordNo++;
+if(e.GetID()==ID)
+{
+cout<<" The old record of employee having ID "<<ID<< " is: ";
+e.DisplayRecord();
+isFound=1;
+break;
+}
+file.read((char*)&e,sizeof(e));
+}
+char tempFile[]="temp.txt";
+fstream temp(tempFile,ios::out|ios::binary);
+if(isFound==0)
+{
+cout<<endl<<"Data not found for employee ID#"<<ID;
+break;
+}
+else
+{
+file.clear();
+file.seekg(0,ios::beg);
+file.read((char*)&e,sizeof(e));
+while(!file.eof())
+{
+if(e.GetID()!=ID)
+temp.write((char*)&e,sizeof(e));
+file.read((char*)&e,sizeof(e));
+}
+file.close();
+temp.close();
+temp.open(tempFile,ios::in|ios::binary);
+file.open(fileName,ios::out|ios::binary);
+temp.read((char*)&e,sizeof(e));
+while(!temp.eof())
+{
+file.write((char*)&e,sizeof(e));
+temp.read((char*)&e,sizeof(e));
+}
+}
+temp.close();
+file.close();
+remove(tempFile);
+file.open(fileName,ios::ate|ios::in|ios::out|ios::binary);
+break;
+
+case '7':
+exit(0);
+break;
+
+
+case'a':
+clrscr();
+pattern();
+cout<<"\n\t\t\tGENERAL CHECKLIST "<<endl;
+cout<<"Hello User,"<<endl<<"It is recommended that before you proceed, go through the general checklist."<<endl;
+
+cout<<"1.Update your anti-virus and run a scan. "<<endl;
+cout<<"\n2.Clean and dust the internal computer parts and fan."<<endl;
+cout<<"\n3.Check out for loose cables and connectors."<<endl;
+cout<<"\n4.Do regular Scan disk to check the hard disk surface for damage."<<endl;
+cout<<"\n5.Use compressed air to remove dust from under the keyboard keys."<<endl;
+break;
+
+
+
+case 'c':
+clrscr();
+cout<<"PREVALENT HARDWARE PROBLEMS WITH THEIR SOLUTIONS "<<endl;
+
+	cout<<"Although most complex computer issues at work can often be solved by the business IT support team, there are many other small, but common, issues that occur on a regular basis on a personal computer. The good news is that many problems with computers have simple solutions, and learning to recognise a problem and fix it yourself will save you a lot of time and money. "<<endl;
+
+	cout<<"\n1.THE COMPUTER WON'T START "<<endl;
+
+	cout<<"\n2.THE SCREEN IS BLANK "<<endl;
+
+	cout<<"\n3.THE SCREEN IS FROZEN "<<endl;
+
+
+	cout<<"\n4.COMPUTER IS SLOW "<<endl;
+
+
+	cout<<"\n5.STRANGE NOISES "<<endl;
+
+	cout<<"\n6.OVERHEATING "<<endl;
+break;
+
+case'12':
+clrscr();
+cout<<"If You would like to make a request for general inquiries regarding ongoing work ";
+cout<<"\nPlease contact our Maintenance Service Cell at 183-2236895";
+cout<<"\n\n\t\t     STAFF DETAILS ";
+cout<<"\n*******************************************************";
+cout<<"\n NAME               DESCRIPTION              CONTACT      ";
+cout<<"\n Mr. Neelansh       Maintenance Manager      232-6455 ";
+cout<<"\n Mr. Aditya         Hardware Engineer        232-6456 ";
+cout<<"\n Mr. Hardeep        IT Consultant            232-6457 ";
+cout<<"\n Mr. Sumit          Network Engineer         233-6577 ";
+cout<<"\n Mr. Raghav         Technical Support        233-4555 ";
+cout<<"\n Mr. Rohit          Troubleshooting          234-4434 ";
+break;
+
+case'e':
+clrscr();
+pattern();
+	cout<<"\nTo replace a hard disk,the following steps must be followed."<<endl;
+	cout<<"\n\n1.Back up the data on exixting hard drive";
+	cout<<"\n\n2.Obtain a full ,bootable copy of the operating system(in case you are replacing priary hard drive).";
+	cout<<"\n\n3.Shut down your computer and unplug it.";
+	cout<<"\n\n4.Ground yourself before opening the computer.";
+	cout<<"\n\n5.Open the computer case.";
+	cout<<"\n\n6.Remove any screws and disconnect the existing drive.";
+	cout<<"\n\n7.Set the jumpers on an IDE drive.";
+	cout<<"\n\n8.Insert the new drive and boot the PC up with the recovery media inserted.";
+break;
+
+case'f':
+clrscr();
+pattern();
+	cout<<"\nTo replace the power supply,";
+	cout<<"\n1.Open the computer case.";
+	cout<<"\n\n2.Disconnect the power leads.";
+	cout<<"\n\n3.Remove the dead power supply.";
+	cout<<"\n\n4.Install the new power supply.";
+	cout<<"\n\n5.Fire it Up.Before you close up the case,make sure everything works.";
+break;
+
+case'g':
+clrscr();
+pattern();
+	cout<<"\nTo replace a video card,";
+	cout<<"\n\n1.Choose a new video card that is compatible with your computer system.";
+	cout<<"\n\n2.Remove your existing video card. To prevent any shocks, wear an antistatic wrist strap. ";
+	cout<<"\n\n3.Insert the new video card firmly and completely. Screw it to the back plate.";
+	cout<<"\n\n4.Install the new drivers.";
+break;
+
+case'h':
+clrscr();
+pattern();
+	cout<<"\nTo replace a motherboard,";
+	cout<<"\n\n1.Disconnect all cables and remove all expansion cards from the current motherboard.";
+	cout<<"\n\n2.Remove the screws that secure the old motherboard and remove the motherboard.";
+	cout<<"\n\n3.Replace the old back-panel I/O template with the template supplied with the new motherboard.";
+	cout<<"\n\n4.Remove and install motherboard mounting posts as necessary to match the mounting holes on the new motherboard.";
+	cout<<"\n\n5.Install the new motherboard and secure it with screws in all mounting hole positions.";
+	cout<<"\n\n6.Reinstall all of the expansion cards and reconnect the cables.";
+break;
+
+case 'i':
+clrscr();
+pattern();
+	cout<<"\nA computer that suddenly shuts off or has difficulty starting up could have a failing power supply. ";
+	cout<<"Check that the computer is plugged into the power point properly and, if that doesn’t work,";
+	cout<<"test the power point with another working device to confirm whether or not there is adequate power.";
+	cout<<"\n\n1.Unplug the power cord. Examine it for breaks or other damage. If you find damage, you know what to replace.";
+	cout<<"\n\n2.If it still does not work, plug something else like a lamp into the same socket. That will tell you if there is a problem with the surge protector or the electric outlet.";
+	cout<<"\n\n3.If the cord appears to be fine and the socket works, try replacing the power cord or, in a laptop, the AC adapter.";
+	cout<<"\n\n4.The problem could be with the power supply. If nothing else fixes the problem, consider replacing that. ";
+break;
+
+case'j':
+clrscr();
+pattern();
+	cout<<"\nIf the computer is on but the screen is blank, there may be an issue with the connection between the computer and the screen. ";
+	cout<<"\nFirst, check to see if the monitor is plugged into a power point and that the connection between the monitor and computer hard drive is secure. ";
+	cout<<"\nIf the problem is on a laptop, then you may need to get a professional to fix it as some of the internal wires may be worn.";
+	cout<<"\n\n1.Verify that your PC has completely restarted and is powering-up from a completely powered-off state.";
+	cout<<"\n\n2.Troubleshoot the cause of the beep code if you're lucky enough to get one";
+	cout<<"\n\n3.Clearing the BIOS memory on your motherboard will return the BIOS settings to their factory default levels. ";
+break;
+
+case'k':
+clrscr();
+pattern();
+	cout<<"\nWhen you computer freezes, you may have no other option than to reboot and risk losing any unsaved work. ";
+	cout<<"Freezes can be a sign of insufficient ram, registry conflicts, corrupt or missing files, or spyware.";
+	cout<<"\nPress and hold the power button until the computer turns off, then restart it and get to work cleaning up the system so that it doesn’t freeze again.";
+	cout<<"\n\n1.Restart";
+	cout<<"\n\n2.Run Windows Update";
+	cout<<"\n\n3.Run a Security Scan";
+break;
+
+case'l':
+clrscr();
+pattern();
+	cout<<"\nA lot of noise coming from your computer is generally a sign of either hardware malfunction or a noisy fan.";
+	cout<<"\nHard drives often make noise just before they fail, so you may want to back up information just in case, ";
+	cout<<"and fans are very easy to replace.";
+	cout<<"\n\n1. Use Disk Defragmenter Or Cleaner to clean the Hard drive";
+	cout<<"\n\n2. Reseat/replace memory, troubleshoot motherboard.";
+	cout<<"\n\n3. Replace ROM BIOS, troubleshoot motherboard.";
+	cout<<"\n\n4. Use an air blower to clean the junks and dust from your computer.";
+break;
+
+case'm':
+clrscr();
+pattern();
+	cout<<"\nIf a computer case lacks a sufficient cooling system, then the computer’s components may start to generate excess heat during operation.";
+	cout<<"\nTo avoid your computer burning itself out, turn it off and let it rest if it’s getting hot. ";
+	cout<<"\nAdditionally, you can check the fan to make sure it’s working properly.";
+	cout<<"\n\n1.Avoid hot neighbors";
+	cout<<"\n\n2.Allow Air Flow";
+	cout<<"\n\n3.Clean Your Computer";
+	cout<<"\n\n4.Upgrade the CPU Cooler";
+break;
+
+
+default:
+cout<<"Invalid Option.Press Enter a valid Choice";
+}
+cout<<"\nDo you want to Continue.....? (y/n) ";
+cin>>ch;
+clrscr();
+}while(ch!='n');
+}
